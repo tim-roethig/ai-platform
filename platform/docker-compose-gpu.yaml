@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   vllm-chat:
     image: vllm/vllm-openai:v0.10.0
@@ -9,6 +11,13 @@ services:
     privileged: true
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
     command: >
       --model=Qwen/Qwen3-4B-FP8
       --max-model-len=2048
@@ -24,6 +33,13 @@ services:
     privileged: true
     environment:
       - NVIDIA_VISIBLE_DEVICES=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['1']
+              capabilities: [gpu]
     command: >
       --model=Qwen/Qwen3-Embedding-0.6B
       --task=embed
@@ -50,3 +66,10 @@ services:
       - ./docling.env
     environment:
       - NVIDIA_VISIBLE_DEVICES=1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['1']
+              capabilities: [gpu]
