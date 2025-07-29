@@ -10,7 +10,7 @@ services:
     shm_size: "3g"
     privileged: true
     environment:
-      - NVIDIA_VISIBLE_DEVICES=0
+      - CUDA_VISIBLE_DEVICES=0
     deploy:
       resources:
         reservations:
@@ -32,7 +32,7 @@ services:
     shm_size: "3g"
     privileged: true
     environment:
-      - NVIDIA_VISIBLE_DEVICES=1
+      - CUDA_VISIBLE_DEVICES=1
     deploy:
       resources:
         reservations:
@@ -65,7 +65,7 @@ services:
     env_file:
       - ./docling.env
     environment:
-      - NVIDIA_VISIBLE_DEVICES=1
+      - CUDA_VISIBLE_DEVICES=1
     deploy:
       resources:
         reservations:
