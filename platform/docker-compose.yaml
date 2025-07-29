@@ -67,7 +67,6 @@ services:
     env_file:
       - ./docling.env
     environment:
-      - CUDA_VISIBLE_DEVICES=1
       - NVIDIA_VISIBLE_DEVICES=1
     deploy:
       resources:
