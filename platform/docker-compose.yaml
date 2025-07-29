@@ -56,7 +56,7 @@ services:
     env_file:
       - ./owui.env
   docling:
-    image: ghcr.io/docling-project/docling-serve-cu124:v1.0.1
+    image: ghcr.io/docling-project/docling-serve-cu124:v0.16.1
     mem_limit: 2g
     cpus: 1
     ports:
