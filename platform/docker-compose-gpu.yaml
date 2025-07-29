@@ -1,0 +1,62 @@
+services:
+  vllm-chat:
+    image: vllm/vllm-openai:v0.10.0
+    mem_limit: 4g
+    cpus: 2
+    ports:
+      - "8000:8000"
+    shm_size: "3g"
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              device_ids: ['0']
+    command: >
+      --model=Qwen/Qwen3-4B-FP8
+      --max-model-len=2048
+      --swap-space=0
+  vllm-embed:
+    image: vllm/vllm-openai:v0.10.0
+    mem_limit: 4g
+    cpus: 2
+    ports:
+      - "8001:8000"
+    shm_size: "3g"
+    privileged: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              device_ids: ['1']
+    command: >
+      --model=Qwen/Qwen3-Embedding-0.6B
+      --max-model-len=1024
+      --gpu-memory-utilization=0.5
+      --swap-space=0
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:v0.6.18
+    mem_limit: 1g
+    cpus: 1
+    ports:
+      - "3000:8080"
+    restart: always
+    env_file:
+      - ./owui.env
+  docling:
+    image: ghcr.io/docling-project/docling-serve-cu124:v1.0.1
+    mem_limit: 2g
+    cpus: 1
+    ports:
+      - "5001:5001"
+    restart: always
+    env_file:
+      - ./docling.env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+              device_ids: ['1']
