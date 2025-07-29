@@ -9,13 +9,8 @@ services:
       - "8000:8000"
     shm_size: "3g"
     privileged: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ['0']
-              capabilities: [gpu]
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
     command: >
       --model=Qwen/Qwen3-4B-FP8
       --max-model-len=2048
@@ -29,13 +24,8 @@ services:
       - "8001:8000"
     shm_size: "3g"
     privileged: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ['1']
-              capabilities: [gpu]
+    environment:
+      - CUDA_VISIBLE_DEVICES=1
     command: >
       --model=Qwen/Qwen3-Embedding-0.6B
       --task=embed
