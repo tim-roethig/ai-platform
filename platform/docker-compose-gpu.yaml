@@ -1,8 +1,8 @@
 services:
   vllm-chat:
     image: vllm/vllm-openai:v0.10.0
-    mem_limit: 4g
-    cpus: 2
+    mem_limit: 2g
+    cpus: 1
     ports:
       - "8000:8000"
     shm_size: "3g"
@@ -19,8 +19,8 @@ services:
       --swap-space=0
   vllm-embed:
     image: vllm/vllm-openai:v0.10.0
-    mem_limit: 4g
-    cpus: 2
+    mem_limit: 2g
+    cpus: 1
     ports:
       - "8001:8000"
     shm_size: "3g"
