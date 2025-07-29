@@ -9,9 +9,6 @@ services:
       - "8000:8000"
     shm_size: "3g"
     privileged: true
-    environment:
-      - CUDA_VISIBLE_DEVICES=0
-      - NVIDIA_VISIBLE_DEVICES=0
     deploy:
       resources:
         reservations:
@@ -32,9 +29,6 @@ services:
       - "8001:8000"
     shm_size: "3g"
     privileged: true
-    environment:
-      - CUDA_VISIBLE_DEVICES=1
-      - NVIDIA_VISIBLE_DEVICES=1
     deploy:
       resources:
         reservations:
