@@ -16,6 +16,7 @@ services:
     command: >
       --model=Qwen/Qwen3-4B-FP8
       --max-model-len=2048
+      --gpu-memory-utilization=0.8
       --swap-space=0
   vllm-embed:
     image: vllm/vllm-openai:v0.10.0
@@ -33,6 +34,7 @@ services:
               device_ids: ['1']
     command: >
       --model=Qwen/Qwen3-Embedding-0.6B
+      --task=embed
       --max-model-len=1024
       --gpu-memory-utilization=0.5
       --swap-space=0
