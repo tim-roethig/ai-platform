@@ -1,0 +1,82 @@
+services:
+  vllm-chat:
+    build:
+      context: /Users/tim/Projekte/da-ai-platform/platform/vllm
+      dockerfile: docker/Dockerfile.cpu
+      target: vllm-openai
+      args:
+        VLLM_CPU_AVX512BF16: "false"  # or "true"
+        VLLM_CPU_AVX512VNNI: "false"  # or "true"
+    mem_limit: 4g
+    cpus: 2
+    volumes:
+      - /Users/tim/Projekte/da-ai-platform/platform/models/Qwen3-0.6B:/Qwen3-0.6B
+    ports:
+      - "8000:8000"
+    environment:
+      VLLM_CPU_KVCACHE_SPACE: "1"
+      VLLM_CPU_OMP_THREADS_BIND: "0-1"
+    shm_size: "3g"
+    privileged: true
+    command: >
+      --model=/Qwen3-0.6B
+      --max-model-len=2048
+      --chat-template=/Qwen3-0.6B/qwen3_nonthinking.jinja
+  vllm-embed:
+    build:
+      context: /Users/tim/Projekte/da-ai-platform/platform/vllm
+      dockerfile: docker/Dockerfile.cpu
+      target: vllm-openai
+      args:
+        VLLM_CPU_AVX512BF16: "false"  # or "true"
+        VLLM_CPU_AVX512VNNI: "false"  # or "true"
+    mem_limit: 4g
+    cpus: 2
+    volumes:
+      - /Users/tim/Projekte/da-ai-platform/platform/models/Qwen3-Embedding-0.6B:/Qwen3-Embedding-0.6B
+    ports:
+      - "8001:8000"
+    environment:
+      VLLM_CPU_KVCACHE_SPACE: "1"
+      VLLM_CPU_OMP_THREADS_BIND: "2-3"
+    shm_size: "3g"
+    privileged: true
+    command: >
+      --model=/Qwen3-Embedding-0.6B
+      --dtype=bfloat16
+      --max-model-len=1024
+  open-webui:
+    # build:
+    #   context: ./open-webui
+    #   dockerfile: Dockerfile
+    image: ghcr.io/open-webui/open-webui:v0.6.18
+    mem_limit: 1g
+    cpus: 1
+    ports:
+      - "3000:8080"
+    # volumes:
+    #   - open-webui:/app/backend/data
+    restart: always
+    env_file:
+      - ./owui.env
+  docling:
+    image: ghcr.io/docling-project/docling-serve-cpu:v1.0.1
+    mem_limit: 2g
+    cpus: 1
+    volumes:
+      - ./test_files:/test_files
+    ports:
+      - "5001:5001"
+    restart: always
+    env_file:
+      - ./docling.env
+  # tika:
+  #   image: apache/tika:3.2.1.0-full
+  #   mem_limit: 1g
+  #   cpus: 1
+  #   ports:
+  #     - "9998:9998"
+  #   restart: always
+
+# volumes:
+#   open-webui:
