@@ -3,42 +3,42 @@ version: "3.9"
 services:
   vllm-chat:
     image: vllm/vllm-openai:v0.10.0
-    mem_limit: 8g
+    mem_limit: 4g
     cpus: 1
     ports:
       - "8000:8000"
     shm_size: "3g"
     privileged: true
     environment:
-      - CUDA_VISIBLE_DEVICES=0
+      - CUDA_VISIBLE_DEVICES=0,1,2
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ['0']
+              device_ids: ['0', '1', '2']
               capabilities: [gpu]
     command: >
       --model=Qwen/Qwen3-4B-FP8
       --max-model-len=2048
-      --gpu-memory-utilization=0.8
+      --gpu-memory-utilization=0.9
       --swap-space=0
   vllm-embed:
     image: vllm/vllm-openai:v0.10.0
-    mem_limit: 8g
+    mem_limit: 4g
     cpus: 1
     ports:
       - "8001:8000"
     shm_size: "3g"
     privileged: true
     environment:
-      - CUDA_VISIBLE_DEVICES=1
+      - CUDA_VISIBLE_DEVICES=3
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ['1']
+              device_ids: ['3']
               capabilities: [gpu]
     command: >
       --model=Qwen/Qwen3-Embedding-0.6B
@@ -69,5 +69,5 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ['1']
+              device_ids: ['3']
               capabilities: [gpu]
