@@ -3,7 +3,7 @@ version: "3.9"
 services:
   vllm-chat:
     image: vllm/vllm-openai:v0.10.0
-    mem_limit: 4g
+    mem_limit: 8g
     cpus: 1
     ports:
       - "8000:8000"
