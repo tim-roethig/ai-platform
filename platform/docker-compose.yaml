@@ -2,9 +2,9 @@ version: "3.9"
 
 services:
   vllm-chat:
-    image: vllm/vllm-openai:v0.10.0
+    image: vllm/vllm-openai:v0.10.2
     mem_limit: 8g
-    cpus: 1
+    cpus: 4
     ports:
       - "8000:8000"
     shm_size: "3g"
@@ -19,56 +19,59 @@ services:
               device_ids: ['0', '1', '2']
               capabilities: [gpu]
     command: >
-      --model=Qwen/Qwen3-4B-FP8
-      --max-model-len=2048
-      --gpu-memory-utilization=0.9
-      --data-parallel-size=3
-      --swap-space=0
-  vllm-embed:
-    image: vllm/vllm-openai:v0.10.0
-    mem_limit: 4g
-    cpus: 1
-    ports:
-      - "8001:8000"
-    shm_size: "3g"
-    privileged: true
-    environment:
-      - CUDA_VISIBLE_DEVICES=3
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ['3']
-              capabilities: [gpu]
-    command: >
-      --model=Qwen/Qwen3-Embedding-0.6B
-      --task=embed
-      --max-model-len=1024
-      --gpu-memory-utilization=0.5
+      --model=Qwen/Qwen2.5-VL-3B-Instruct
+      --max-model-len=32K
+      --gpu-memory-utilization=0.95
+      --tensor-parallel-size=3
       --swap-space=0
   open-webui:
-    image: ghcr.io/open-webui/open-webui:v0.6.18
+    image: ghcr.io/open-webui/open-webui:v0.6.28
     mem_limit: 1g
-    cpus: 1
+    cpus: 2
     ports:
       - "3000:8080"
     restart: always
     env_file:
       - ./owui.env
   docling:
-    image: ghcr.io/docling-project/docling-serve-cu124:v0.16.1
+    image: ghcr.io/docling-project/docling-serve-cu124:v1.5.0
     mem_limit: 2g
-    cpus: 1
+    cpus: 2
     ports:
       - "5001:5001"
     restart: always
     env_file:
       - ./docling.env
+    environment:
+      - CUDA_VISIBLE_DEVICES=4
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: ['3']
+              device_ids: ['4']
               capabilities: [gpu]
+  # vllm-embed:
+  #   image: vllm/vllm-openai:v0.10.0
+  #   mem_limit: 4g
+  #   cpus: 1
+  #   ports:
+  #     - "8001:8000"
+  #   shm_size: "3g"
+  #   privileged: true
+  #   environment:
+  #     - CUDA_VISIBLE_DEVICES=3
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             device_ids: ['3']
+  #             capabilities: [gpu]
+  #   command: >
+  #     --model=Qwen/Qwen3-Embedding-0.6B
+  #     --task=embed
+  #     --max-model-len=1024
+  #     --gpu-memory-utilization=0.5
+  #     --swap-space=0
+  
