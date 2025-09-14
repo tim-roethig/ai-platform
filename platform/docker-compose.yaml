@@ -20,7 +20,7 @@ services:
               capabilities: [gpu]
     command: >
       --model=Qwen/Qwen2.5-VL-3B-Instruct
-      --quantization=FP8
+      --quantization=fp8
       --max-model-len=32K
       --gpu-memory-utilization=0.95
       --tensor-parallel-size=3
