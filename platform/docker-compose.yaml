@@ -1,6 +1,6 @@
 services:
   vllm-chat:
-    image: vllm/vllm-openai:v0.10.2
+    image: vllm/vllm-openai:v0.10.1
     mem_limit: 8g
     cpus: 4
     ports:
