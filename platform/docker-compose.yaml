@@ -24,7 +24,7 @@ services:
       --tensor-parallel-size=3
       --swap-space=0
   docling:
-    image: ghcr.io/docling-project/docling-serve-cu124:v1.5.0
+    image: ghcr.io/docling-project/docling-serve-cu128:v1.5.0
     mem_limit: 8g
     cpus: 2
     ports:
