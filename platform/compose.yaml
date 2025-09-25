@@ -18,7 +18,7 @@ services:
               capabilities: [ gpu ]
     command: >
       --model=HuggingFaceTB/SmolVLM-256M-Instruct
-      --max-model-len=32K
+      --max-model-len=4K
       --gpu-memory-utilization=0.4
       --tensor-parallel-size=1
       --swap-space=0
