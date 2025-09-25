@@ -9,6 +9,13 @@ services:
     privileged: true
     environment:
       - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0']
+              capabilities: [ gpu ]
     command: >
       --model=HuggingFaceTB/SmolVLM-256M-Instruct
       --max-model-len=4K
@@ -26,6 +33,13 @@ services:
       - ./docling.env
     environment:
       - CUDA_VISIBLE_DEVICES=0
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              capabilities: [ gpu ]
   open-webui:
     image: ghcr.io/open-webui/open-webui:v0.6.30
     mem_limit: 2g
