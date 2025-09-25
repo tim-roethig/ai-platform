@@ -1,3 +1,12 @@
+git clone https://github.com/tim-roethig/ai-platform.git
+cd ai-platform/platform
+docker compose up -d
+
+
+
+
+
+
 #docker network create shared-network
 docker compose up -d
 #docker compose -f ./LibreChat/deploy-compose.yml up -d

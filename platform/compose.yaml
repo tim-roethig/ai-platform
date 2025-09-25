@@ -17,7 +17,11 @@ services:
               device_ids: [ '0']
               capabilities: [ gpu ]
     command: >
-      --model=Qwen/Qwen2.5-VL-3B-Instruct --max-model-len=32K --gpu-memory-utilization=0.9 --tensor-parallel-size=1 --swap-space=0
+      --model=HuggingFaceTB/SmolVLM-256M-Instruct
+      --max-model-len=32K
+      --gpu-memory-utilization=0.4
+      --tensor-parallel-size=1
+      --swap-space=0
   docling:
     image: ghcr.io/docling-project/docling-serve-cu124:v1.5.1
     mem_limit: 8g
@@ -28,13 +32,13 @@ services:
     env_file:
       - ./docling.env
     environment:
-      - CUDA_VISIBLE_DEVICES=1
+      - CUDA_VISIBLE_DEVICES=0
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
-              device_ids: [ '1' ]
+              device_ids: [ '0' ]
               capabilities: [ gpu ]
   open-webui:
     image: ghcr.io/open-webui/open-webui:v0.6.30
