@@ -30,7 +30,6 @@ Short description.
 1. Can a Business contact be involved on demand?
 1. How complex is it?
 1. How many dependencies do we have?
-1. How long will it take?
 1. Is there a MVP with reduced scope that is already useful?
 
 ### Risk

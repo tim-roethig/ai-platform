@@ -1,5 +1,5 @@
 #docker network create shared-network
-docker compose -f ./docker-compose.yaml up -d
+docker compose up -d
 #docker compose -f ./LibreChat/deploy-compose.yml up -d
 #curl http://localhost:8000/v1/models
 #curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/json" -N -d '{"model": "/Qwen3-0.6B","messages": [{"role": "system", "content": "You are a helpful assistant."},{"role": "user", "content": "Write a long text."}],"stream": true}'
@@ -22,3 +22,17 @@ vllm serve RedHatAI/Qwen2.5-VL-72B-Instruct-FP8-dynamic \
 # 33 tokens/sec
 # GPU KV cache size: 803,600 tokens
 # Maximum concurrency for 32,768 tokens per request: 24.52x
+
+
+vllm serve Qwen/Qwen3-235B-A22B-Instruct-2507-FP8 \
+    --tensor-parallel-size 8 \
+    --enable-expert-parallel \
+    --gpu-memory-utilization 0.90 \
+    --swap-space 0 \
+    --max-model-len 32K
+
+OLLAMA_KV_CACHE_TYPE=q8_0 \
+OLLAMA_CONTEXT_LENGTH=32768 \
+ollama run hf.co/unsloth/Qwen3-235B-A22B-Instruct-2507-GGUF:Q8_0
+
+
