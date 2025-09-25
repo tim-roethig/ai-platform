@@ -45,7 +45,7 @@ services:
     mem_limit: 2g
     cpus: 2
     ports:
-      - "3000:3000"
+      - "8080:8080"
     restart: always
     env_file:
       - ./owui.env
