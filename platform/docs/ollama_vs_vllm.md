@@ -1,11 +1,18 @@
 # Ollama vs vLLM comparison
-## Text Environment
+vLLM and Ollama are both open‑source frameworks for running large‑language models, but they are designed for different goals. vLLM was developed by researchers at UC‑Berkeley’s Sky Computing Lab to squeeze maximum throughput from GPUs for production‑grade inference, while Ollama is a wrapper around the llama‑cpp library (now shifting to their own engine) that emphasizes simplicity and cross‑platform support.
+
+## Why vLLM is Faster
+### PagedAttention
+The main bottleneck when serving LLMs is managing the key‑value (KV) cache used in attention layers. vLLM introduces a “PagedAttention” algorithm that treats the KV cache like a virtual memory system. Instead of allocating one large contiguous block for each sequence, it stores the cache in flexible “pages.” This avoids the severe memory fragmentation and wasted VRAM that afflict traditional approaches and allows vLLM to reuse memory across requests. By pre‑allocating GPU memory up to the maximum sequence length and managing it efficiently, vLLM can serve more concurrent sequences without running out of memory. Ollama, in contrast, uses llama‑cpp’s straightforward caching scheme it works well on consumer hardware but lacks these advanced memory optimizations.
+
+### Continuous batching
+Traditional inference servers build fixed batches of requests and wait for all responses before starting the next batch, under‑utilizing GPUs when some requests finish early. vLLM implements continuous batching—an “assembly‑line” approach that dynamically adds incoming requests to the batch as soon as there is room. This keeps GPUs busy and reduces queuing delay. Ollama generally handles requests one at a time or with limited batching, so GPU utilization drops quickly as concurrency increases. (Observed in tests)
+
+## Benchmark
 GPUs: 2x NVIDIA RTX L40S 48GB
 Model: Qwen3-30B-A3B-Instruct-2507-FP8
-System Prompt: You are a helpful assistant.
-User Prompt: Write a long text about AI.
 
-### Test Script
+### Benchmark Script
 ```python
 %%time
 import requests
@@ -22,12 +29,49 @@ def num_tokens_from_string(string: str, encoding_name: str = "cl100k_base") -> i
     num_tokens = len(encoding.encode(string))
     return num_tokens
 
-port = 11434
-model = "hf.co/unsloth/Qwen3-30B-A3B-Instruct-2507-GGUF:Q8_0"
+port = 8000
+model = "Qwen/Qwen3-4B-Instruct-2507-FP8"
 url = f"http://0.0.0.0:{port}/v1/chat/completions"
 headers = {"Content-Type": "application/json"}
-prompt = "Write a long text about AI."
-num_runs = 1
+prompt = """Artificial Intelligence: An Evolving Force
+Artificial Intelligence (AI) refers to the development of computer systems that can perform tasks which traditionally required human intelligence. These tasks include recognizing patterns, understanding natural language, solving problems, making decisions, and even creating new content. While the term "AI" often evokes futuristic images of humanoid robots, the reality is that AI is already deeply embedded in daily life, shaping industries and transforming societies worldwide.
+A Brief History
+The concept of AI dates back centuries, with myths of artificial beings in ancient civilizations. However, the modern field began in the 1950s, when pioneers like Alan Turing, John McCarthy, and Marvin Minsky laid the theoretical and experimental groundwork. Turing’s famous question, “Can machines think?”, became a catalyst for decades of exploration. Early AI research focused on symbolic reasoning—teaching machines to follow logical rules. But as computers advanced, new approaches such as machine learning, neural networks, and deep learning emerged, enabling systems to learn from data rather than being explicitly programmed.
+Types of AI
+AI can be broadly categorized into three types:
+Narrow AI (Weak AI):
+The most common form today. Narrow AI systems are designed to handle specific tasks, such as speech recognition, image classification, or recommendation systems on streaming platforms. They outperform humans in their narrow domains but lack general intelligence.
+General AI (Strong AI):
+A theoretical form of AI that would have the ability to understand, learn, and apply intelligence across a wide range of tasks—similar to human cognition. General AI remains largely speculative and a topic of ongoing debate.
+Superintelligent AI:
+A hypothetical stage where AI surpasses human intelligence in all areas, potentially leading to groundbreaking discoveries—or existential risks. Scholars and technologists discuss this possibility with both excitement and caution.
+How AI Works
+At its core, AI relies on algorithms—sets of rules that allow computers to process data. Machine learning, a subset of AI, involves feeding systems vast amounts of data so they can recognize patterns and make predictions. Deep learning, inspired by the human brain, uses layered neural networks to process complex data such as images, speech, and text. The rise of powerful hardware and cloud computing has accelerated progress, making today’s AI systems more capable than ever.
+Applications of AI
+AI is no longer confined to research labs; it powers much of the technology we interact with daily:
+Healthcare: AI helps doctors detect diseases, analyze medical images, and develop personalized treatment plans. It is also used in drug discovery and pandemic tracking.
+Business and Finance: From fraud detection to customer support chatbots, AI automates processes and enhances decision-making.
+Transportation: Self-driving cars, predictive traffic systems, and AI-driven logistics are transforming how people and goods move.
+Education: Personalized learning platforms adapt to student needs, providing tailored lessons and feedback.
+Entertainment: Recommendation engines on streaming services and AI-generated art or music highlight creativity’s intersection with technology.
+Everyday Life: Virtual assistants like Siri, Alexa, and ChatGPT showcase AI’s ability to interact naturally with humans.
+Benefits of AI
+AI offers tremendous opportunities. It increases efficiency, reduces human error, and unlocks new innovations. By automating repetitive tasks, it allows people to focus on more creative and strategic work. In science, AI accelerates research, enabling breakthroughs in fields ranging from climate modeling to astrophysics. It also has the potential to democratize knowledge and services, making advanced tools accessible to more people.
+Challenges and Concerns
+Despite its promise, AI poses serious challenges:
+Bias and Fairness: AI systems can inherit biases from their training data, leading to unfair outcomes in areas like hiring, policing, and lending.
+Privacy: AI’s reliance on massive datasets raises concerns about surveillance and misuse of personal information.
+Job Displacement: Automation threatens to replace some human jobs, requiring societies to rethink education, workforce training, and economic safety nets.
+Ethical Use: From autonomous weapons to misinformation, AI can be weaponized in harmful ways.
+Control and Alignment: Ensuring that increasingly powerful AI systems act in accordance with human values is a pressing research concern.
+The Future of AI
+The trajectory of AI is both promising and uncertain. Many experts envision a future where AI augments human capabilities, solving problems previously thought insurmountable. At the same time, policymakers, researchers, and citizens must grapple with ethical and societal implications. Global collaboration will be crucial to ensure AI’s benefits are widely shared and its risks managed responsibly.
+Conclusion
+Artificial Intelligence is not just a technological revolution—it is a societal transformation. From healthcare to art, AI reshapes how we live, work, and imagine the future. Whether it becomes humanity’s greatest tool or its most dangerous invention depends on the choices made today. The story of AI is still unfolding, and every individual, business, and government has a role to play in shaping its impact.
+Would you like me to make this more academic and formal (like a research-style essay), or more engaging and narrative (like an article for a general audience)?
+
+Rewrite this text in a longer form."""
+num_runs = 16
 
 print_lock = threading.Lock()
 shutdown = threading.Event()
@@ -108,7 +152,7 @@ for t in threads:
 print("\nAll threads finished.")
 ```
 
-## vLLM
+### vLLM
 ```
 (workspace) (main) root@C.26183956:/workspace$ vllm --version
 INFO 09-24 19:55:02 [__init__.py:216] Automatically detected platform cuda.
@@ -156,7 +200,7 @@ Wed Sep 24 20:09:11 2025
 +-----------------------------------------------------------------------------------------+
 ```
 
-### Single Request
+#### Single Request
 ```
 [0001] <stream complete> (14.278 sec) (1655 tokens) (115.915 tokens/sec)
 
@@ -165,7 +209,7 @@ CPU times: user 91.5 ms, sys: 47 ms, total: 139 ms
 Wall time: 14.3 s
 ```
 
-### 8 parallel requests
+#### 8 parallel requests
 ```
 [0008] <stream complete> (18.403 sec) (1289 tokens) (70.042 tokens/sec)
 [0002] <stream complete> (19.308 sec) (1344 tokens) (69.608 tokens/sec)
@@ -180,7 +224,8 @@ All threads finished.
 CPU times: user 1.22 s, sys: 644 ms, total: 1.87 s
 Wall time: 27 s
 ```
-### 32 parallel requests
+
+#### 32 parallel requests
 ```
 [0003] <stream complete> (25.601 sec) (1209 tokens) (47.224 tokens/sec)
 [0009] <stream complete> (26.346 sec) (1245 tokens) (47.256 tokens/sec)
@@ -219,17 +264,18 @@ All threads finished.
 CPU times: user 4.98 s, sys: 2.55 s, total: 7.53 s
 Wall time: 42.3 s
 ```
-### 256 parallel requests
+
+#### 256 parallel requests
 All threads finished.
 CPU times: user 37.1 s, sys: 20.8 s, total: 57.9 s
 Wall time: 2min 7s
 
-### 1024 parallel requests
+#### 1024 parallel requests
 All threads finished.
 CPU times: user 2min 33s, sys: 1min 21s, total: 3min 55s
 Wall time: 9min 29s
 
-## ollama v0.12.1
+### ollama v0.12.1
 ```
 root@C.26181166:/$ ollama --version
 ollama version is 0.12.1
@@ -277,7 +323,7 @@ Wed Sep 24 20:29:11 2025
 +-----------------------------------------------------------------------------------------+
 ```
 
-### Single Request
+#### Single Request
 ```
 [0001] <stream complete> (19.597 sec) (2125 tokens) (108.437 tokens/sec)
 
@@ -286,7 +332,7 @@ CPU times: user 303 ms, sys: 94.7 ms, total: 398 ms
 Wall time: 19.6 s
 ```
 
-### 8 parallel requests
+#### 8 parallel requests
 ```
 [0005] <stream complete> (68.692 sec) (1522 tokens) (22.157 tokens/sec)
 [0007] <stream complete> (81.954 sec) (1810 tokens) (22.086 tokens/sec)
@@ -301,7 +347,8 @@ All threads finished.
 CPU times: user 2.44 s, sys: 1.04 s, total: 3.48 s
 Wall time: 1min 50s
 ```
-### 32 parallel requests
+
+#### 32 parallel requests
 ```
 [0002] <stream complete> (81.716 sec) (1633 tokens) (19.984 tokens/sec)
 [0011] <stream complete> (84.674 sec) (1690 tokens) (19.959 tokens/sec)
@@ -340,14 +387,15 @@ All threads finished.
 CPU times: user 9.03 s, sys: 3.51 s, total: 12.5 s
 Wall time: 6min 9s
 ```
-### 256 parallel requests
+
+#### 256 parallel requests
 takes to long
 
-### 1024 parallel requests
+#### 1024 parallel requests
 takes to long
 
 
-## ollama v0.12.2
+### ollama v0.12.2
 ```
 root@C.26181166:/$ ollama --version
 ollama version is 0.12.2
@@ -392,7 +440,8 @@ Wed Sep 24 22:08:17 2025
 |    1   N/A  N/A      2927      C   /usr/local/bin/ollama                       43494MiB |
 +-----------------------------------------------------------------------------------------+
 
-### 32 parallel requests
+#### 32 parallel requests
+```
 [0005] <stream complete> (144.988 sec) (1344 tokens) (9.270 tokens/sec)
 [0016] <stream complete> (157.020 sec) (1457 tokens) (9.279 tokens/sec)
 [0020] <stream complete> (161.997 sec) (1508 tokens) (9.309 tokens/sec)
@@ -429,3 +478,4 @@ Wed Sep 24 22:08:17 2025
 All threads finished.
 CPU times: user 10.6 s, sys: 4.36 s, total: 14.9 s
 Wall time: 4min 16s
+```

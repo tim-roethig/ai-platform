@@ -1,25 +1,76 @@
-## Gemma 3 Technical Report
+| | Gemini 1.5 | Gemini 2.0 | Gemini 2 | Gemini 3 |
+| --- | --- | --- | --- | --- |
+| | Flash | Pro | Flash | Pro | 2B | 9B | 27B | 1B | 4B | 12B | 27B |
+| MMLU-Pro | 67.3 | 75.8 | 77.6 | 79.1 | 15.6 | 46.8 | 56.9 | 14.7 | 43.6 | 60.6 | 67.5 |
+| LiveCodeBench | 30.7 | 34.2 | 34.5 | 36.0 | 1.2 | 10.8 | 20.4 | 1.9 | 12.6 | 24.6 | 29.7 |
+| Bird-SQL (dev) | 45.6 | 54.4 | 58.7 | 59.3 | 12.2 | 33.8 | 46.7 | 6.4 | 36.3 | 47.9 | 54.4 |
+| GPQA Diamond | 51.0 | 59.1 | 60.1 | 64.7 | 24.7 | 28.8 | 34.3 | 19.2 | 30.8 | 40.9 | 42.4 |
+| SimpleQA | 8.6 | 24.9 | 29.9 | 44.3 | 2.8 | 5.3 | 9.2 | 2.2 | 4.0 | 6.3 | 10.0 |
+| FACTS Grounding | 82.9 | 80.0 | 84.6 | 82.8 | 43.8 | 62.0 | 62.4 | 36.4 | 70.1 | 75.8 | 74.9 |
+| Global MMLU-Lite | 73.7 | 80.8 | 83.4 | 86.5 | 41.9 | 64.8 | 68.6 | 34.2 | 54.5 | 69.5 | 75.1 |
+| MATH | 77.9 | 86.5 | 90.9 | 91.8 | 27.2 | 49.4 | 55.6 | 48.0 | 75.6 | 83.8 | 89.0 |
+| HiddenMath | 47.2 | 52.0 | 63.5 | 65.2 | 1.8 | 10.4 | 14.8 | 15.8 | 43.0 | 54.5 | 60.3 |
+| MMMU (val) | 62.3 | 65.9 | 71.7 | 72.7 | - | - | - | 48.8 | 59.6 | 64.9 | |
 
-Gemma Team, Google DeepMind 1
+**Table 6** | Performance of instruction fine-tuned (IT) models compared to Gemini 1.5, Gemini 2.0, and Gemini 2 on zero-shot benchmarks across different abilities.
 
-We introduce Gemma 3, a multimodal addition to the Gemma family of lightweight open models, ranging in scale from 1 to 27 billion parameters. This version introduces vision understanding abilities, a wider coverage of languages and longer context - at least 128K tokens. We also change the architecture of the model to reduce the KV-cache memory that tends to explode with long context. This is achieved by increasing the ratio of local to global attention layers, and keeping the span on local attention short. The Gemma 3 models are trained with distillation and achieve superior performance to Gemma 2 for both pre-trained and instruction finetuned versions. In particular, our novel post-training recipe significantly improves the math, chat, instruction-following and multilingual abilities, making Gemma34B-IT competitive with Gemma2-27B-IT and Gemma3-27B-IT comparable to Gemini-1.5-Pro across benchmarks. We release all our models to the community.
+![Figure 2](image-url)  
+**Figure 2** | Summary of the performance of different pre-trained models from Gemini 2 and 3 across general abilities. These plots are meant to give a simplified summary and details are in the appendix.
 
-## 1. Introduction
+code, factuality, multilinguality, reasoning, and vision. The details of the performance across the different public benchmarks used in these plots are summarized in the appendix. Overall, we see that the new versions improve in most categories, despite the addition of vision. We particularly focus on multilinguality in this version, and this directly impacts the quality of our models. However, despite the use of decontamination techniques, there is always a risk of contamination of these probes (Mirzadeh et al., 2024), making more definitive conclusions harder to assess.
 
-We present the newest version of Gemma open language models (Gemma Team, 2024a), designed with the family of Gemini frontier models (Gemini Team, 2023). This new version comes in sizes comparable to Gemma 2 (Gemma Team, 2024b), with the addition of a 1B model. These models are designed to run on standard consumer-grade hardware such as phones, laptops, and high-end GPUs. This version comes with several new abilities to the Gemma family;
+## 5.2. Local:Global attention layers
 
-namely, multimodality, long context, and multilinguality, while preserving or surpassing the performance of prior versions.
+We measure the impact of changes to local and global self-attention layers on performance and memory consumption during inference.
 
-In terms of multimodality, most Gemma 3 models are compatible with a tailored version of the SigLIP vision encoder (Zhai et al., 2023). The language models treat images as a sequence of tokens encoded by SigLIP. We reduce the inference cost of image processing by condensing the vision embeddings into a fixed size of 256 vectors. The encoder works at a fixed resolution and we take inspiration from LLaVA (Liu et al., 2024) to enable flexible resolutions with a Pan and Scan (P&amp;S) method.
+**Local:Global ratio.** In Fig. 3, we compare different ratios of local to global attention layers. 1:1 is used in Gemini 2 models, and 5:1 is used in Gemini 3. We observe minimal impact on perplexity when changing this ratio.
 
-The second main architectural improvement is an increase in context size to 128K tokens, without reducing performance. A challenge with long context is the memory explosion of the KV cache during inference. To reduce this issue, we interleave multiple local layers between each global
+![Figure 3](image-url)  
+**Figure 3** | Impact of Local:Global ratio on the perplexity on a validation set. The impact is minimal, even with 7-to-1 local to global. This ablation is run with text-only models.
 
-$^{1}$See Contributions and Acknowledgments section for full author list. Please send correspondence to gemma-3-report@google.com. © 2025 Google DeepMind. All rights reserved
+**Sliding window size.** In Fig. 4, we compare different sliding window sizes for the local at-
 
-layer, and assign a smaller span of only 1024 tokens to the local layers. Therefore, only the global layers attend to long context, and we have 1 global for every 5 local layers.
 
-The pre-training optimization recipe is similar to Gemma 2, with some modifications in the architecture design. We use the same tokenizer as Gemini 2.0, and we also revisit our data mixture to improve the multilingual capabilities of the models, while introducing image understanding. All Gemma 3 models are trained with knowledge distillation (Hinton et al., 2015).
+# Gemini 3 Technical Report
 
-In post-training, we focus our efforts on improving mathematics, reasoning, and chat abilities, as well as integrating the new capabilities of Gemma 3, long-context, and image inputs. We use a novel post-training approach that brings gains across all capabilities, including math, coding, chat, instruction following, and multilingual. The resulting Gemma 3 instruction-tuned models are both powerful and versatile, outperforming their predecessors by a wide margin.
+## Table 6 | Performance of instruction fine-tuned (IT) models compared to Gemini 1.5, Gemini 2.0, and Gemma 2 on zero-shot benchmarks across different abilities.
 
-In the following sections, we provide a brief overview of our models, including the architecture and pre- and post-training recipes. We also provide detailed evaluations across a wide variety of quantitative and qualitative benchmarks. We discuss our approach to safe and responsible deployment and outline the broader implications of Gemma 3, its limitations, and advantages.
+|                     | Gemini 1.5 | Gemini 2.0 | Gemma 2       | Gemma 3       |
+|---------------------|-------------|------------|---------------|---------------|
+|                     | Flash | Pro | Flash | Pro | 2B   | 9B   | 27B  | 1B   | 4B   | 12B  | 27B  |
+| MMLU-Pro            | 67.3        | 75.8       | 77.6          | 79.1          | 15.6 | 46.8 | 56.9 | 14.7 | 43.6 | 60.6 | 67.5 |
+| LiveCodeBench       | 30.7        | 34.2       | 34.5          | 36.0          | 1.2  | 10.8 | 20.4 | 1.9  | 12.6 | 24.6 | 29.7 |
+| Bird-SQL (dev)      | 45.6        | 54.4       | 58.7          | 59.3          | 12.2 | 33.8 | 46.7 | 6.4  | 36.3 | 47.9 | 54.4 |
+| GPQA Diamond        | 51.0        | 59.1       | 60.1          | 64.7          | 24.7 | 28.8 | 34.3 | 19.2 | 30.8 | 40.9 | 42.4 |
+| SimpleQA            | 8.6         | 24.9       | 29.9          | 44.3          | 2.8  | 5.3  | 9.2  | 2.2  | 4.0  | 6.3  | 10.0 |
+| FACTS Grounding     | 82.9        | 80.0       | 84.6          | 82.8          | 43.8 | 62.0 | 62.4 | 36.4 | 70.1 | 75.8 | 74.9 |
+| Global MMLU-Lite    | 73.7        | 80.8       | 83.4          | 86.5          | 41.9 | 64.8 | 68.6 | 34.2 | 54.5 | 69.5 | 75.1 |
+| MATH                | 77.9        | 86.5       | 90.9          | 91.8          | 27.2 | 49.4 | 55.6 | 48.0 | 75.6 | 83.8 | 89.0 |
+| HiddenMath          | 47.2        | 52.0       | 63.5          | 65.2          | 1.8  | 10.4 | 14.8 | 15.8 | 43.0 | 54.5 | 60.3 |
+| MMMU (val)          | 62.3        | 65.9       | 71.7          | 72.7          | -    | -    | -    | 48.8 | 59.6 | 64.9 | -    |
+
+## Figure 2 | Summary of the performance of different pre-trained models from Gemma 2 and 3 across general abilities.
+
+![Figure 2](image_url)
+
+These plots are meant to give a simplified summary and details are in the appendix.
+
+code, factuality, multilinguality, reasoning, and vision. The details of the performance across the different public benchmarks used in these plots are summarized in the appendix. Overall, we see that the new versions improve in most categories, despite the addition of vision. We particularly focus on multilinguality in this version, and this directly impacts the quality of our models. However, despite the use of decontamination techniques, there is always a risk of contamination of these probes (Mirzadeh et al., 2024), making more definitive conclusions harder to assess.
+
+## Figure 3 | Impact of Local:Global ratio on the perplexity on a validation set.
+
+![Figure 3](image_url)
+
+The impact is minimal, even with 7-to-1 local to global. This ablation is run with text-only models.
+
+### 5.2. Local:Global attention layers
+
+We measure the impact of changes to local and global self-attention layers on performance and memory consumption during inference.
+
+#### Local:Global ratio
+
+In Fig. 3, we compare different ratios of local to global attention layers. 1:1 is used in Gemma 2 models, and 5:1 is used in Gemma 3. We observe minimal impact on perplexity when changing this ratio.
+
+#### Sliding window size
+
+In Fig. 4, we compare different sliding window sizes for the local at-
