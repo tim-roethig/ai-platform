@@ -62,7 +62,7 @@ DeepEval is a LLM evaluation framework with e.g. LLM as judge implementations th
 ## Release process
 ```mermaid
 graph TD
-    A[Docker Registry (harbor.group.intra)]
+    A[Docker Registry (harbor)]
     B[DEV GPU Server (2xRTX4090)]
     C[PROD GPU Server (8xL40S)]
 
