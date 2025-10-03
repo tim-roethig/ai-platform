@@ -94,6 +94,7 @@ graph TD
     subgraph BJSS[BJSS]
         C
         D
+        S3
         UAT
         PROD
     end
