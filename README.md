@@ -108,4 +108,5 @@ graph TD
     HF -- Test new ML models --> B
 
     Internet -- Onboard tested Docker images --> C
+    Internet -- Onboard tested AI models --> S3
 ```
