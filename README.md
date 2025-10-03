@@ -67,7 +67,7 @@ graph TD
     B[On Demand Cloud GPU Server]
     HELM[helm chart describing our deployment]
     C[Harbor Image Registry]
-    D[Azure DevOps Git]
+    D[Azure DevOps Repos]
     S3[S3 Object Storage]
     E[DEV GPU Server 2xRTX4090]
     F[PROD GPU Server 8xL40S]
@@ -117,6 +117,6 @@ graph TD
     C --> HELM
     S3 --> HELM
 
-    HELM -- deploy to --> UAT_OC
+    HELM -- deploy to via Azure DevOps Pipelines --> UAT_OC
     UAT -- promote tested product --> PROD
 ```
