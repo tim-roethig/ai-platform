@@ -80,7 +80,7 @@ graph TD
     end
 
     subgraph DEV[DEV]
-        B
+        VAST_AI
     end
     subgraph UAT[UAT]
         UAT_OC
