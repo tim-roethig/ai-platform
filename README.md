@@ -96,6 +96,7 @@ graph TD
         C
         D
         S3
+        HELM
         UAT
         PROD
     end
