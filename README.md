@@ -101,5 +101,5 @@ graph TD
         DEV
     end
 
-    A -->[test] B
+    A -- test --> B
 ```
