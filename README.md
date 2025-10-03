@@ -69,8 +69,8 @@ graph TD
     C[Harbor Image Registry]
     D[Azure DevOps Repos]
     S3[S3 Object Storage]
-    E[DEV GPU Server 2xRTX4090]
-    F[PROD GPU Server 8xL40S]
+    E[GPU Server 2xRTX4090]
+    F[GPU Server 8xL40S]
 
     subgraph VAST_AI[vast.ai]
         B
@@ -92,7 +92,7 @@ graph TD
         PROD_OC
     end
 
-    subgraph Intranet[INTRANET]
+    subgraph Intranet[Intranet]
         C
         D
         S3
