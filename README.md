@@ -59,7 +59,7 @@ Docling is content extraction tool that uses AI models to preprocess various fil
 #### DeepEval
 DeepEval is a LLM evaluation framework with e.g. LLM as judge implementations that can be used to evaluate LLM systems, when a test data set is present.
 
-## Release process
+## IT Infra for containerized (AI) workloads
 ```mermaid
 graph TD
     A[Open Source Container Registry]
