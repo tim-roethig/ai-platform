@@ -62,13 +62,16 @@ DeepEval is a LLM evaluation framework with e.g. LLM as judge implementations th
 ## Release process
 ```mermaid
 graph TD
-    A[Open Source Container Registry]
-    B[Vast.ai GPU Servers]
+    A[Open Source Container Registry ]
+    B[On Demand Cloud GPU Server]
     C[Harbor]
     D[Azure DevOps GIT]
     E[DEV GPU Server 2xRTX4090]
     F[PROD GPU Server 8xL40S]
 
+    subgraph VAST_AI[vast.ai]
+        B
+    end
     subgraph UAT_OC[UAT OpenShift]
         E
     end
