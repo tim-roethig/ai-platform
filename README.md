@@ -75,10 +75,10 @@ graph TD
     subgraph VAST_AI[vast.ai]
         B
     end
-    subgraph UAT_OC[UAT OpenShift]
+    subgraph UAT_OC[UAT OpenShift IBIC Namespace]
         E
     end
-    subgraph PROD_OC[PROD OpenShift]
+    subgraph PROD_OC[PROD OpenShift IBIC Namespace]
         F
     end
 
