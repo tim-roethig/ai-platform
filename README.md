@@ -116,4 +116,6 @@ graph TD
     HELM -- version in --> D
     C --> HELM
     S3 --> HELM
+
+    HELM -- deploy to --> UAT_OC
 ```
