@@ -118,4 +118,5 @@ graph TD
     S3 --> HELM
 
     HELM -- deploy to --> UAT_OC
+    UAT -- promote tested product --> PROD
 ```
