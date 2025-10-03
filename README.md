@@ -65,8 +65,9 @@ graph TD
     A[Open Source Container Registry]
     HF[Huggingface]
     B[On Demand Cloud GPU Server]
+    HELM[helm chart describing our deployment]
     C[Harbor Image Registry]
-    D[Azure DevOps GIT]
+    D[Azure DevOps Git]
     S3[S3 Object Storage]
     E[DEV GPU Server 2xRTX4090]
     F[PROD GPU Server 8xL40S]
@@ -110,4 +111,8 @@ graph TD
 
     Internet -- Onboard tested Docker images --> C
     Internet -- Onboard tested AI models --> S3
+
+    HELM -- version in --> D
+    C --> HELM
+    S3 --> HELM
 ```
