@@ -100,4 +100,6 @@ graph TD
         A
         DEV
     end
+
+    A -->[test] B
 ```
