@@ -65,8 +65,9 @@ graph TD
     A[Open Source Container Registry]
     HF[Huggingface]
     B[On Demand Cloud GPU Server]
-    C[Harbor]
+    C[Harbor Image Registry]
     D[Azure DevOps GIT]
+    S3[S3 Object Storage]
     E[DEV GPU Server 2xRTX4090]
     F[PROD GPU Server 8xL40S]
 
@@ -105,4 +106,6 @@ graph TD
 
     A -- Test new images for OpenWebUI, vllm, etc. --> B
     HF -- Test new ML models --> B
+
+    Internet -- Onboard tested Docker images --> C
 ```
