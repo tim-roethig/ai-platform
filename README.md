@@ -62,7 +62,8 @@ DeepEval is a LLM evaluation framework with e.g. LLM as judge implementations th
 ## Release process
 ```mermaid
 graph TD
-    A[Open Source Container Registry ]
+    A[Open Source Container Registry]
+    HF[Huggingface]
     B[On Demand Cloud GPU Server]
     C[Harbor]
     D[Azure DevOps GIT]
@@ -98,8 +99,10 @@ graph TD
 
     subgraph Internet[Internet]
         A
+        HF
         DEV
     end
 
-    A -- test --> B
+    A -- Test new images for OpenWebUI, vllm, etc. --> B
+    HF -- Test new ML models --> B
 ```
