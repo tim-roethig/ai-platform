@@ -62,19 +62,36 @@ DeepEval is a LLM evaluation framework with e.g. LLM as judge implementations th
 ## Release process
 ```mermaid
 graph TD
-    A[Docker Registry harbor]
-    B[DEV GPU Server 2xRTX4090]
-    C[PROD GPU Server 8xL40S]
+    A[Open Source Container Registry]
+    B[Vast.ai GPU Servers]
+    C[Harbor]
+    D[Azure DevOps GIT]
+    E[DEV GPU Server 2xRTX4090]
+    F[PROD GPU Server 8xL40S]
 
-    A --> B
-    B --> A
-    A --> C
+    subgraph UAT_OC[UAT OpenShift]
+        E
+    end
+    subgraph PROD_OC[PROD OpenShift]
+        F
+    end
 
-    subgraph 1[DEV]
+    subgraph DEV[DEV]
         B
     end
-    subgraph 2[PROD]
-        C
+    subgraph UAT[UAT]
+        UAT_OC
+    end
+    subgraph PROD[PROD]
+        PROD_OC
     end
 
+    subgraph BJSS[BJSS]
+        UAT
+        PROD
+    end
+
+    subgraph Internet[Internet]
+        DEV
+    end
 ```
