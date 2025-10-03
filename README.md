@@ -92,7 +92,7 @@ graph TD
         PROD_OC
     end
 
-    subgraph BJSS[BJSS]
+    subgraph Intranet[INTRANET]
         C
         D
         S3
