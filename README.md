@@ -65,7 +65,7 @@ graph TD
     A[Open Source Container Registry]
     HF[Huggingface]
     B[On Demand Cloud GPU Server]
-    HELM[helm chart describing our deployment]
+    HELM[helm chart describing deployment]
     C[Harbor Image Registry]
     D[Azure DevOps Repos]
     S3[S3 Object Storage]
@@ -75,20 +75,20 @@ graph TD
     subgraph VAST_AI[vast.ai]
         B
     end
-    subgraph UAT_OC[UAT OpenShift IBIC Namespace]
+    subgraph UAT_OC[IBIC Namespace]
         E
     end
-    subgraph PROD_OC[PROD OpenShift IBIC Namespace]
+    subgraph PROD_OC[IBIC Namespace]
         F
     end
 
     subgraph DEV[DEV]
         VAST_AI
     end
-    subgraph UAT[UAT]
+    subgraph UAT[UAT OpenShift]
         UAT_OC
     end
-    subgraph PROD[PROD]
+    subgraph PROD[PROD OpenShift]
         PROD_OC
     end
 
@@ -117,6 +117,6 @@ graph TD
     C --> HELM
     S3 --> HELM
 
-    HELM -- deploy to via Azure DevOps Pipelines --> UAT_OC
+    HELM -- deploy via Azure DevOps Pipelines --> UAT_OC
     UAT -- promote tested product --> PROD
 ```
