@@ -14,7 +14,7 @@ services:
               capabilities: [gpu]
     command: >
       --model=Qwen/Qwen2-VL-2B-Instruct
-      --max-model-len=4K
+      --max-model-len=2K
       --gpu-memory-utilization=0.8
       --tensor-parallel-size=1
       --swap-space=0
