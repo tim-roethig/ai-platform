@@ -13,7 +13,7 @@ services:
               device_ids: ["0"]
               capabilities: [gpu]
     command: >
-      --model=Qwen/Qwen2-VL-2B-Instruct
+      --model=Qwen/Qwen2-VL-2B-Instruct-AWQ
       --max-model-len=2K
       --gpu-memory-utilization=0.8
       --tensor-parallel-size=1
