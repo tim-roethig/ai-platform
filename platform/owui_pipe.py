@@ -3,8 +3,10 @@ class Pipe:
         pass
 
     def _contains_file(self, body: dict) -> bool:
+        print("-------------BODY----------------")
         print(body)
-        pass
+        print("-------------BODY----------------")
+        return True
 
     def _needs_parsing(self, file_type: dict) -> bool:
         pass

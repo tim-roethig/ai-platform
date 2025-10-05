@@ -2,7 +2,9 @@ git clone https://github.com/tim-roethig/ai-platform.git
 cd ai-platform/platform
 docker compose up -d
 
-
+git pull
+docker compose down
+docker compose up -d
 
 
 
