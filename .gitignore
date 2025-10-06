@@ -347,6 +347,3 @@ terraform.rc
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform,python,helm,pycharm,visualstudiocode
 /platform/models/*
-/use_cases/investment_research_agent
-roadmap.md
-questions.md
