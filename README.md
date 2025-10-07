@@ -107,7 +107,7 @@ graph TD
         DEV
     end
 
-    A -- Test new images for OpenWebUI, vllm, etc. --> B
+    A -- Test new Docker images --> B
     HF -- Test new ML models --> B
 
     Internet -- Onboard tested Docker images --> C
