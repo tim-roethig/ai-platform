@@ -122,13 +122,15 @@ graph TD
 ```
 
 ## Open topics
-1. Can we have a fully disconected environment (equivaltent to a private laptop) to:
-   - simulate our prod server in cloud for testing without data
-   - quickly develop sultions that do not need BJSS data
-   - test new docker images before onboarding them
-   - test new AI models before onboarding them
-2. Is there an automated process to onboard new docker images?
-3. Is there any Object storage that we can use to store our AI models? We would need to be able to download from it from our Servers.
-4. What is the central solution BJSS to version code and create CI/CD pipelines?
-5. Can our Servers be integrated into OpenShift? Can we get Namespace in OpenShift?
-6. Do we need an alterantive to OpenShift? E.g. plain k8s or k3s?
+1.	Can we have a fully disconnected environment (equivalent to a private laptop) to:
+    - simulate our prod server in cloud for testing without data
+    - quickly develop solutions that do not need BJSS data
+    - test new docker images before onboarding them
+    - test new AI models before onboarding them
+3.	Is there an automated process to onboard new docker images?
+4.	Is there any Object storage that we can use to store our AI models? We would need to be able to download from it from our Servers.
+5.	What is the central solution BJSS to version code and create CI/CD pipelines?
+6.	Can our Servers be integrated into OpenShift? Can we get Namespace in OpenShift?
+7.	Do we need an alternative to OpenShift? E.g. plain k8s or k3s?
+
+
