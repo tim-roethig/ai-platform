@@ -13,28 +13,19 @@ services:
               device_ids: ["0"]
               capabilities: [gpu]
     command: >
-      --model=Qwen/Qwen2.5-VL-7B-Instruct
-      --max-model-len=2K
+      --model=Qwen/Qwen3-VL-4B-Instruct-FP8
+      --max-model-len=4K
       --gpu-memory-utilization=0.9
       --tensor-parallel-size=1
       --swap-space=0
   docling:
-    image: ghcr.io/docling-project/docling-serve-cu128:v1.6.0
+    image: ghcr.io/docling-project/docling-serve-cpu:v1.7.0
     ports:
       - "5001:5001"
     env_file:
       - ./docling.env
-    environment:
-      - CUDA_VISIBLE_DEVICES=0
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ["0"]
-              capabilities: [gpu]
   open-webui:
-    image: ghcr.io/open-webui/open-webui:v0.6.32
+    image: ghcr.io/open-webui/open-webui:v0.6.34
     ports:
       - "8080:8080"
     env_file:
