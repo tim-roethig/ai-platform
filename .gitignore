@@ -347,3 +347,5 @@ terraform.rc
 
 # End of https://www.toptal.com/developers/gitignore/api/terraform,python,helm,pycharm,visualstudiocode
 /platform/models/*
+/archive
+/test_files

@@ -1,0 +1,26 @@
+# ./monitoring/lgtm/collector.yaml
+receivers:
+  # LGTM already has an OTLP receiver; we add a Prometheus scrape for vLLM.
+  prometheus/vllm:
+    config:
+      scrape_configs:
+        - job_name: "vllm"
+          metrics_path: /metrics
+          static_configs:
+            - targets: ["vllm-chat:8000"]   # change 8000 if your vLLM metrics are on a different port
+
+processors:
+  # batch is already used by LGTM; including it here is typically safe.
+  batch:
+
+exporters: {}  # we rely on LGTM's existing exporters (to Mimir/Tempo/Loki)
+
+service:
+  pipelines:
+    metrics:
+      # IMPORTANT: include this receiver in the existing metrics pipeline.
+      # LGTM’s base config already has: receivers: [otlp], processors: [batch], exporters: [...]
+      # By listing prometheus/vllm here, we append to that list.
+      receivers: [otlp, prometheus/vllm]
+      processors: [batch]
+      # Do not override exporters; LGTM routes metrics to its metrics backend out of the box.
